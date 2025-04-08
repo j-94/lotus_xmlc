@@ -1,6 +1,8 @@
 # Keep only essential files
 *
-!Dataset.jsonl
 !Ontology.yaml
 !*.ipynb
 !.gitignore
+
+# Specifically exclude large files
+Dataset.jsonl
