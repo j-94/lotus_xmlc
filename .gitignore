@@ -1,31 +1,6 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Jupyter Notebook
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-
-# Large data files
-ontology_label_index/*
-!ontology_label_index/.gitkeep
-
-# macOS
-.DS_Store
+# Keep only essential files
+*
+!Dataset.jsonl
+!Ontology.yaml
+!*.ipynb
+!.gitignore
