@@ -19,9 +19,15 @@ from datetime import datetime
 import re
 from tqdm import tqdm
 
-# Set API key directly
-os.environ['OPENAI_API_KEY'] = "sk-dummy-key-for-testing"
-print("✅ OpenAI API key set in the environment.")
+# Check for OpenAI API key in environment
+api_key = os.environ.get('OPENAI_API_KEY')
+if not api_key:
+    # Prompt for API key if not found in environment
+    api_key = input("Please enter your OpenAI API key: ")
+    os.environ['OPENAI_API_KEY'] = api_key
+    print("✅ OpenAI API key set from user input.")
+else:
+    print("✅ OpenAI API key found in environment variables.")
 
 # Monkey patch numpy.lib.stride_tricks to add broadcast_to if needed
 import numpy as np
@@ -279,7 +285,7 @@ print(f"Created sample dataset with {len(df_sample)} items for testing.")
 # Function to assign ontology labels to a text
 def assign_labels(text, label_names, label_descriptions, top_k=5):
     """
-    Assign ontology labels to a text using LOTUS semantic operations.
+    Assign ontology labels to a text using LOTUS semantic operations with OpenAI.
     
     Args:
         text: The text to classify
@@ -291,23 +297,64 @@ def assign_labels(text, label_names, label_descriptions, top_k=5):
         List of assigned label names
     """
     try:
-        # Create a dataframe with the labels
-        label_df = pd.DataFrame({
-            'label_name': label_names,
-            'label_description': label_descriptions
-        })
-        
-        # Use LOTUS semantic search to find matching labels
-        # In LOTUS, the accessor is registered as 'sem_search'
-        # We also need to create an index for the search to work
-        
-        # First, we need to create an index for the label descriptions
-        # This requires setting up the vector store
-        if not hasattr(label_df, 'attrs'):
-            label_df.attrs = {}
+        # First try to use LOTUS LM for classification
+        try:
+            # Create a prompt for the language model
+            prompt = f"""
+            You are an expert classifier. Your task is to assign the most relevant labels to the following text.
             
-        # For simplicity, let's use a different approach
-        # We'll use simple text matching to find the most relevant labels
+            TEXT:
+            {text}
+            
+            AVAILABLE LABELS:
+            """
+            
+            # Add label descriptions to the prompt
+            for i, (name, desc) in enumerate(zip(label_names, label_descriptions)):
+                prompt += f"{i+1}. {name}: {desc}\n"
+                
+            prompt += f"""
+            INSTRUCTIONS:
+            1. Analyze the text carefully.
+            2. Select up to {top_k} labels that best match the content of the text.
+            3. Return ONLY the label names in a comma-separated list.
+            4. If no labels match, return "None".
+            
+            SELECTED LABELS:
+            """
+            
+            # Use LOTUS LM to get the response
+            response = lotus.lm(prompt)
+            
+            # Parse the response to extract label names
+            if response and response.lower() != "none":
+                # Split by commas and clean up each label
+                predicted_labels = [label.strip() for label in response.split(',')]
+                
+                # Filter to only include valid labels
+                valid_labels = [label for label in predicted_labels if label in label_names]
+                
+                # Limit to top_k
+                return valid_labels[:top_k]
+            else:
+                # Fallback to text matching if LM returns "None"
+                return text_matching_fallback(text, label_names, label_descriptions, top_k)
+                
+        except Exception as lm_error:
+            print(f"Warning: LM classification failed: {lm_error}")
+            print("Falling back to text matching...")
+            return text_matching_fallback(text, label_names, label_descriptions, top_k)
+            
+    except Exception as e:
+        print(f"Error assigning labels: {e}")
+        return []
+
+# Fallback method using text matching
+def text_matching_fallback(text, label_names, label_descriptions, top_k=5):
+    """
+    Fallback method using text matching when LM classification fails.
+    """
+    try:
         matched_labels = []
         for i, (name, desc) in enumerate(zip(label_names, label_descriptions)):
             # Make sure the description is a string
@@ -347,7 +394,7 @@ def assign_labels(text, label_names, label_descriptions, top_k=5):
         return matched_labels[:top_k]
             
     except Exception as e:
-        print(f"Error assigning labels: {e}")
+        print(f"Error in text matching fallback: {e}")
         return []
 
 # Test the label assignment on a single item

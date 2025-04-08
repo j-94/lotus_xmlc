@@ -17,9 +17,15 @@ from tqdm import tqdm
 # Suppress warnings
 warnings.filterwarnings('ignore')
 
-# Set API key (dummy for testing)
-os.environ['OPENAI_API_KEY'] = "sk-dummy-key-for-testing"
-print("✅ OpenAI API key set in the environment.")
+# Check for OpenAI API key in environment
+api_key = os.environ.get('OPENAI_API_KEY')
+if not api_key:
+    print("❌ Error: OpenAI API key not found in environment variables.")
+    print("Please set your OPENAI_API_KEY environment variable before running this script.")
+    print("Example: export OPENAI_API_KEY='your-api-key-here'")
+    sys.exit(1)
+else:
+    print("✅ OpenAI API key found in environment variables.")
 
 # Function to clean text
 def clean_text(text):
@@ -41,7 +47,7 @@ def clean_text(text):
 # Function to assign labels
 def assign_labels(text, label_names, label_descriptions, top_k=5):
     """
-    Assign ontology labels to a text using simple text matching.
+    Assign ontology labels to a text using LOTUS semantic operations with OpenAI.
     
     Args:
         text: The text to classify
@@ -53,7 +59,67 @@ def assign_labels(text, label_names, label_descriptions, top_k=5):
         List of assigned label names
     """
     try:
-        # Create a dataframe with the labels
+        # First try to use LOTUS LM for classification
+        try:
+            # Import LOTUS for LM access
+            import lotus
+            
+            # Create a prompt for the language model
+            prompt = f"""
+            You are an expert classifier. Your task is to assign the most relevant labels to the following text.
+            
+            TEXT:
+            {text}
+            
+            AVAILABLE LABELS:
+            """
+            
+            # Add label descriptions to the prompt
+            for i, (name, desc) in enumerate(zip(label_names, label_descriptions)):
+                prompt += f"{i+1}. {name}: {desc}\n"
+                
+            prompt += f"""
+            INSTRUCTIONS:
+            1. Analyze the text carefully.
+            2. Select up to {top_k} labels that best match the content of the text.
+            3. Return ONLY the label names in a comma-separated list.
+            4. If no labels match, return "None".
+            
+            SELECTED LABELS:
+            """
+            
+            # Use LOTUS LM to get the response
+            response = lotus.lm(prompt)
+            
+            # Parse the response to extract label names
+            if response and response.lower() != "none":
+                # Split by commas and clean up each label
+                predicted_labels = [label.strip() for label in response.split(',')]
+                
+                # Filter to only include valid labels
+                valid_labels = [label for label in predicted_labels if label in label_names]
+                
+                # Limit to top_k
+                return valid_labels[:top_k]
+            else:
+                # Fallback to text matching if LM returns "None"
+                return text_matching_fallback(text, label_names, label_descriptions, top_k)
+                
+        except Exception as lm_error:
+            print(f"Warning: LM classification failed: {lm_error}")
+            print("Falling back to text matching...")
+            return text_matching_fallback(text, label_names, label_descriptions, top_k)
+            
+    except Exception as e:
+        print(f"Error assigning labels: {e}")
+        return []
+
+# Fallback method using text matching
+def text_matching_fallback(text, label_names, label_descriptions, top_k=5):
+    """
+    Fallback method using text matching when LM classification fails.
+    """
+    try:
         matched_labels = []
         for i, (name, desc) in enumerate(zip(label_names, label_descriptions)):
             # Make sure the description is a string
@@ -92,7 +158,7 @@ def assign_labels(text, label_names, label_descriptions, top_k=5):
         return matched_labels[:top_k]
             
     except Exception as e:
-        print(f"Error assigning labels: {e}")
+        print(f"Error in text matching fallback: {e}")
         return []
 
 def main():

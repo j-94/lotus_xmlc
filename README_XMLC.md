@@ -45,7 +45,22 @@ This script will:
 
 ## Label Assignment Algorithm
 
-The label assignment algorithm uses a text matching approach to assign ontology labels to bookmarks:
+The label assignment algorithm uses a two-tier approach:
+
+### Primary Method: OpenAI-powered Classification
+
+The primary method uses LOTUS's language model (powered by OpenAI) to perform classification:
+
+1. A prompt is constructed with:
+   - The text to classify
+   - Available labels and their descriptions
+   - Instructions for classification
+2. The language model analyzes the text and returns the most relevant labels
+3. The response is parsed to extract valid label names
+
+### Fallback Method: Text Matching
+
+If the language model fails (e.g., due to API issues or no matches found), a text matching approach is used:
 
 1. For each label in the ontology:
    - Extract significant terms from the label description
@@ -80,6 +95,19 @@ The script produces a CSV file with the following columns:
 - html5lib
 - lotus-ai
 - tqdm
+
+## API Key Requirements
+
+This project requires an OpenAI API key to use the language model capabilities of LOTUS. You can provide your API key in one of two ways:
+
+1. **Environment Variable**: Set the `OPENAI_API_KEY` environment variable before running the scripts:
+   ```bash
+   export OPENAI_API_KEY='your-api-key-here'
+   ```
+
+2. **Interactive Input**: The interactive script (`xmlc_processor.py`) will prompt you for your API key if it's not found in the environment.
+
+Note: The batch processor (`batch_processor.py`) requires the API key to be set as an environment variable.
 
 ## License
 
