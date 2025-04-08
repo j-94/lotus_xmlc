@@ -1,0 +1,267 @@
+// Agent: Notebook Agent
+// Task: Enrich bookmark data (JSONL) using a custom ontology (YAML) and LOTUS framework
+// Goal: Prepare data for XMLC and potential Knowledge Graph construction.
+// Constraint: Adhere to sudolang format, reflecting the Python plan's logic.
+
+// SECTION 0: Initial Setup
+
+// Configure Secure Credentials
+//   Action: Ensure OpenAI API Key is accessible.
+//   Method: Prioritize secure methods like environment variables or secrets management.
+//   Detail: Avoid hardcoding keys directly in the script.
+//   Verification: Check if API key is present before proceeding.
+
+// Load Libraries
+//   Action: Import necessary packages.
+//   Includes: `lotus`, `pandas`, `yaml`, `beautifullsoup`, `html`, `os`, `warnings`.
+//   Note: Assume libraries are installed via pip (as in Python counterpart).
+//   Configuration: Suppress common warnings for cleaner execution logs.
+
+// END SECTION 0
+
+// SECTION 1: Configure LOTUS Environment
+
+// Configure LOTUS Framework
+//   Action: Initialize and register core LOTUS models.
+//   Components:
+//     1. LanguageModel (`lm`):
+//        Purpose: Text understanding, generation, classification prompts.
+//        Model Choice: `gpt-4o-mini` (Example - balance capability/cost).
+//     2. RetrievalModel (`rm`):
+//        Purpose: Text embedding for semantic search/similarity.
+//        Model Choice: `intfloat/e5-base-v2` (Example - strong sentence embeddings).
+//     3. RerankerModel (`reranker`) (Optional but Recommended):
+//        Purpose: Refine semantic search results for better relevance.
+//        Model Choice: `mixedbread-ai/mxbai-rerank-large-v1` (Example).
+//   Registration: `lotus.settings.configure(lm=lm, rm=rm, reranker=reranker)`.
+//   Verification: Log configured model names. Handle configuration errors.
+
+// END SECTION 1
+
+// SECTION 2: Load Bookmark Data
+
+// Load Data
+//   Source: `data-bookmark.jsonl` (Ensure file exists in environment).
+//   Format: JSON Lines (each line is a valid JSON object).
+//   Action: Read data into a structured format (e.g., Pandas DataFrame `df`).
+//   Tool: Use appropriate JSONL reader (like `pd.read_json(lines=True)`).
+//   Verification: Log success, DataFrame shape (`rows`, `columns`). Display basic info and sample rows.
+//   Expectation: Columns like `id`, `url`, `source`, `title`, `content`, `created_at`, `domain`, `metadata` should be present. Handle loading errors (e.g., `FileNotFoundError`).
+
+// END SECTION 2
+
+// SECTION 3: Explore and Clean Data
+
+// Explore and Clean Data
+//   Purpose: Understand data characteristics and address inconsistencies for semantic quality.
+
+//   Subsection 3.1: Initial Exploration
+//     Action: Analyze the raw data structure and content.
+//     Checks:
+//       - `Schema`: Column names, data types, non-null counts.
+//       - `Distributions`: Value counts for categorical fields (`source`, `domain`).
+//       - `Missing Values`: Quantify nulls per column.
+//       - `Text Lengths`: Statistics (min, max, mean) for `title` and `content` lengths. Identify potential truncation issues.
+//       - `Sample Review`: Look at actual content examples.
+
+//   Subsection 3.2: Cleaning Steps
+//     Action: Apply transformations to improve data quality.
+//     Steps:
+//       1. Clean Text Fields (`title`, `content` -> `cleaned_title`, `cleaned_content`):
+//          - `Remove HTML tags`.
+//          - `Decode HTML entities` (e.g., `&` -> `&`).
+//          - `Normalize whitespace` (multiple spaces/newlines -> single space).
+//          - `Handle NaNs/Non-strings`: Convert to empty string `""`.
+//       2. Handle Missing Essential Text:
+//          - `Strategy`: `Drop rows` if both `cleaned_title` AND `cleaned_content` are empty after cleaning. Log count dropped.
+//          - `Fill remaining NaNs` in cleaned text columns with `""`.
+//       3. Parse Dates (`created_at` -> `created_at_dt`):
+//          - `Convert` string dates to datetime objects.
+//          - `Handle errors`: Coerce unparseable dates to `NaT` (Not a Time). Log count of invalid dates.
+//       4. Handle Duplicates:
+//          - `Identify By`: `url` column.
+//          - `Strategy`: Keep the `most recent` entry based on `created_at_dt`.
+//          - `Implementation`: Sort by `url` then `created_at_dt` (desc), then drop duplicates keeping the first. Log count removed.
+
+//   Verification: Log completion of cleaning. Display info and sample of the cleaned DataFrame.
+
+// END SECTION 3
+
+// SECTION 4: Prepare Data for LOTUS Operators
+
+// Prepare Data for LOTUS
+//   Purpose: Structure data optimally for semantic processing.
+
+//   Step 4.1: Create Unified Text Input
+//     Action: Generate a single text field representing each bookmark.
+//     Method: `Concatenate` `cleaned_title` and `cleaned_content` into a new column `combined_text`.
+//     Separator: Use a space (" ") or other suitable separator.
+//     Handling Emptiness: Ensure graceful handling if title or content was originally empty. Trim resulting whitespace.
+
+//   Step 4.2: Extract Existing Metadata Labels
+//     Action: Pull out any pre-existing tags or categories from the `metadata` column.
+//     Assumption: Tags might be stored under a specific key (e.g., `metadata['raindrop_tags']`). **Adjust key based on actual structure.**
+//     Method: Define a function to safely access and extract tags (e.g., return list of tags or empty list `[]` if not found/invalid). Apply this function to the `metadata` column -> `existing_tags`.
+//     Logging: Report how many rows had existing tags extracted.
+
+//   Verification: Display sample rows showing `url`, `combined_text`, `existing_tags`. Log final DataFrame shape.
+
+// END SECTION 4
+
+// SECTION 5: Ontology Loading and Preparation
+
+// Load and Prepare Ontology
+//   Purpose: Load the custom ontology and structure its labels for use in LOTUS.
+
+//   Step 5.1: Load Ontology Definition
+//     Source: `ontology.yaml` (Ensure file exists).
+//     Action: Parse the YAML file into an in-memory structure (e.g., Python dictionary `ontology_structure`).
+//     Tool: Use a YAML parsing library.
+//     Verification: Log success. Optionally print a snippet of the loaded structure. Handle file not found or parsing errors.
+
+//   Step 5.2: Extract Labels and Descriptions
+//     Action: Traverse the `ontology_structure` to extract all relevant labels, their descriptions, and potentially their hierarchical paths.
+//     Method: Implement a traversal function (likely recursive).
+//       - `Identify Labels`: Based on patterns in the YAML structure (e.g., keys, presence of a 'description' field, items under specific lists like 'instances'). **This logic MUST be tailored to the specific ontology YAML format.**
+//       - `Extract`: For each identified label, get its `name`, `description` (provide a default if missing), and `path` (e.g., `Domain/SubCategory/Instance`).
+//       - `Store`: Collect these as tuples `(label, description, path)` into a list `labels_collection`.
+//     Verification: Log the number of labels extracted. Warn if none were found.
+
+//   Step 5.3: Create Label DataFrame for LOTUS
+//     Action: Convert the extracted `labels_collection` into a structured format suitable for LOTUS indexing.
+//     Method: Create a DataFrame `labels_df` with columns `label`, `description`, `path`.
+//     Enhancement: Create a combined field `label_plus_desc` (e.g., "Label Name: Label Description") as this often improves embedding quality for search.
+//     Verification: Display sample rows of `labels_df`.
+
+//   Step 5.4: Prepare Label Lists
+//     Action: Create simple lists of label names for potential use in other LOTUS operators (like classification).
+//     Method: Extract unique label names from `labels_df` -> `all_label_names` list.
+//     Optional: Create more specific lists (e.g., top-level domains) if needed, based on ontology structure.
+
+// END SECTION 5
+
+// SECTION 6: XMLC - Assign Ontology Labels using LOTUS
+
+// Assign Ontology Labels (XMLC)
+//   Purpose: Enrich bookmarks with multiple relevant labels from the prepared ontology. Handle potentially large label sets (Extreme Multi-Label Classification).
+
+//   Primary Strategy (A): Embedding-Based Semantic Similarity Search
+//     Rationale: Efficient and scalable for large label spaces. Finds semantically related labels beyond exact keyword matches.
+//     Requires: `labels_df` prepared in Step 5.
+
+//     Step 6.A.1: Index Ontology Labels
+//       Action: Create a searchable vector index from the ontology labels.
+//       Input: `labels_df`, specifically the `label_plus_desc` column (or `description`).
+//       Tool: LOTUS `sem_index` operator, utilizing the configured `RetrievalModel` (`rm`).
+//       Output: An indexed version of `labels_df`, stored persistently (e.g., directory `ontology_label_index`). Ensure index directory is clean before indexing.
+//       Logging: Report start and completion of indexing.
+
+//     Step 6.A.2: Perform Semantic Similarity Join
+//       Action: Find the top `K` most similar ontology labels for each bookmark.
+//       Tool: LOTUS `sem_sim_join` operator.
+//       Inputs:
+//         - Left DataFrame: Main bookmark `df`, using the `combined_text` column.
+//         - Right DataFrame: The indexed `labels_df` from Step 6.A.1, using the indexed column (`label_plus_desc`).
+//         - Parameter `K`: Number of top labels to retrieve per bookmark (e.g., `K=10`).
+//         - Optional: Use `RerankerModel` (`reranker`) for improved relevance.
+//       Output: A DataFrame `enriched_df` where each row represents a match between a bookmark and an ontology label (includes bookmark data, label data, and similarity `_score`).
+//       Logging: Report start and completion of the join. Display sample matched rows.
+
+//     Step 6.A.3: Aggregate Top K Labels
+//       Action: Consolidate the multiple matches per bookmark back into single entries with lists of labels.
+//       Method:
+//         - `Sort` the `enriched_df` by the original bookmark identifier and then by `_score` (descending).
+//         - `Group by` the original bookmark identifier.
+//         - `Aggregate` the `label`, `_score`, and `path` for each group into lists.
+//       Output: A temporary structure (e.g., DataFrame) mapping original bookmark ID to lists: `ontology_labels_k`, `ontology_scores_k`, `ontology_paths_k`.
+
+//     Step 6.A.4: Merge Aggregated Labels into Final DataFrame
+//       Action: Add the aggregated label lists back to the main bookmark DataFrame.
+//       Method: `Merge` the aggregated results (from 6.A.3) with the cleaned `df` based on the original bookmark identifier (index).
+//       Result: `df_final` DataFrame, now containing columns like `ontology_labels_k`, etc.
+//       Handling No Matches: Ensure these new list columns contain empty lists `[]` for bookmarks that had no matches (if any).
+//       Logging: Report completion. Display sample of `df_final` with aggregated labels.
+//     Error Handling: Catch exceptions during Strategy A; if it fails, ensure `df_final` exists and proceed, potentially with empty label columns.
+
+
+//   Supplementary Strategy (C): Keyword Extraction and Matching
+//     Rationale: Captures explicit mentions of ontology terms (high precision). Complements semantic search.
+
+//     Step 6.C.1: Extract Mentioned Entities
+//       Action: Use the LLM to identify specific terms (tools, concepts, etc.) within the bookmark text.
+//       Tool: LOTUS `sem_extract` operator.
+//       Input: `df_final['combined_text']`.
+//       Prompt/Output Definition: Define structured output, e.g., `{"mentioned_entities": "List specific tools, libraries, concepts..."}`.
+//       Result: Adds a `mentioned_entities` column (likely containing lists of strings) to `df_final`.
+
+//     Step 6.C.2: Match Extracted Entities to Ontology
+//       Action: Compare the extracted `mentioned_entities` against the known ontology labels.
+//       Input: `mentioned_entities` column, `all_label_names` list/set (from Step 5.4).
+//       Method: For each entity in `mentioned_entities`, check if it exists in `all_label_names` (consider case-insensitivity or fuzzy matching).
+//       Result: Create a new column `keyword_matched_labels` containing lists of ontology labels found via extraction. Keep matches unique per bookmark.
+//     Logging: Report completion. Display sample `mentioned_entities` and `keyword_matched_labels`.
+
+
+//   Combine Labels (Optional but Recommended)
+//     Action: Create a unified list of labels derived from both semantic search (Strategy A) and keyword extraction (Strategy C).
+//     Method: For each row in `df_final`, take the `union` of labels in `ontology_labels_k` and `keyword_matched_labels`. Ensure the final list contains unique labels.
+//     Result: Create a new column `combined_ontology_labels`.
+//     Logging: Report completion. Display sample comparison of source label lists and the combined list.
+
+
+// END SECTION 6
+
+// SECTION 7: Ontology Expansion Analysis (Optional)
+
+// Analyze for Ontology Expansion (Optional)
+//   Purpose: Use data patterns to suggest potential additions or refinements to the ontology *for manual review*.
+//   Control: Use a flag (e.g., `RUN_EXPANSION_ANALYSIS`) to enable/disable this section.
+
+//   Step 7.1: Clustering for Theme Discovery
+//     Action: Group bookmarks based on semantic similarity of their text content.
+//     Tool: LOTUS `sem_cluster_by` operator, using `RetrievalModel` (`rm`).
+//     Input: `df_final['combined_text']`. Requires indexing this column first (`sem_index`).
+//     Parameter: `num_clusters` (e.g., 30).
+//     Result: Adds a `_cluster_id` column to the DataFrame.
+//     Analysis: Manually examine bookmarks within each cluster. Identify clusters whose content themes are not well-represented by existing ontology labels. These themes might indicate missing concepts/categories.
+
+//   Step 7.2: Extraction for New Entities
+//     Action: Use the LLM to specifically look for potentially unknown or new terms.
+//     Tool: LOTUS `sem_extract` operator.
+//     Input: `df_final['combined_text']`.
+//     Prompt/Output Definition: Target extraction towards novelty, e.g., `{"potential_new_entities": "List any specific software tools, libraries, technical concepts... that might be relatively new or niche."}`.
+//     Result: Adds a `potential_new_entities` column.
+//     Analysis: Manually review the unique items in `potential_new_entities`. Filter out terms already present in the ontology. The remainder are candidates for addition.
+
+//   Logging: Report if analysis was run or skipped. If run, indicate completion and where results (cluster IDs, potential entities) can be found in the DataFrame. Emphasize manual review needed. Handle errors gracefully.
+
+// END SECTION 7
+
+// SECTION 8: Store Enriched Data
+
+// Store Enriched Data
+//   Purpose: Save the final DataFrame containing the original data plus the added semantic labels.
+//   Target: `df_final`.
+//   Output File: `enriched_bookmarks.jsonl` (or `.csv`, `.parquet`).
+//   Format: JSON Lines recommended for downstream processing compatibility. Specify orientation (`records`) and line separation (`lines=True`). Handle date formats correctly.
+//   Optional: Select only relevant columns before saving to reduce file size.
+//   Action: Write the DataFrame to the specified file.
+//   Logging: Report success and the path/name of the saved file. Report final shape of saved data. Handle saving errors.
+
+// END SECTION 8
+
+// SECTION 9: Finish Task & Summarize
+
+// Summarize Execution
+//   Action: Provide a concluding summary of the notebook's operations.
+//   Content:
+//     - Confirmation of LOTUS model configuration.
+//     - Initial and final data row counts (after cleaning).
+//     - Confirmation of ontology loading and label preparation.
+//     - Recap of XMLC enrichment strategies applied (e.g., sem_sim_join K value, keyword extraction).
+//     - Note on whether ontology expansion analysis was performed.
+//     - Confirmation of output file saving and its name/location.
+//     - Optional: Report total LLM token usage/cost if available from the `lm` object.
+//   Purpose: Give a clear overview of the completed process and results.
+
+// END SECTION 9

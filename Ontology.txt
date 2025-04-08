@@ -1,0 +1,459 @@
+# Ontology for Technical Projects, AI/ML, Software Dev, PKM, and Business Ideas
+# Version: 1.1
+# Date: 2025-04-04
+# Enhanced for XMLC (eXtreme Multi-Label Classification)
+
+# --- Top-Level Domains ---
+
+AI_Machine_Learning:
+  description: Concepts, tools, and applications related to Artificial Intelligence and Machine Learning.
+  subcategories:
+    - Core_Concepts:
+        type: Concept_Area
+        description: Fundamental ideas and architectures in AI/ML.
+        instances:
+          - LLM: { type: Concept, description: Large Language Models }
+          - RAG: { type: Concept, description: Retrieval-Augmented Generation }
+          - Vector_Database: { type: Concept, description: Databases optimized for vector similarity search }
+          - AI_Agents: { type: Concept, description: Autonomous systems performing tasks }
+          - Prompt_Engineering: { type: Concept, description: Crafting effective inputs for LLMs }
+          - LMops: { type: Concept, description: Operations for managing the lifecycle of Language Models }
+          - XMLC: { type: Concept, description: Extreme Multi-label Classification }
+          - Multi_Label_Classification: { type: Concept, description: Assigning multiple labels to items }
+          - Hierarchical_Classification: { type: Concept, description: Classification with hierarchical label structures }
+          - Information_Extraction: { type: Concept, description: Extracting structured information from unstructured data }
+          - Topic_Modeling: { type: Concept, description: Discovering abstract topics in document collections }
+          - Deep_Learning: { type: Concept, description: Neural network-based machine learning }
+          - Function_Calling: { type: Concept, description: LLMs using external tools/APIs }
+          - Knowledge_Distillation: { type: Concept, description: Transferring knowledge between models }
+          - AutoML: { type: Concept, description: Automated machine learning pipeline optimization }
+          - Reinforcement_Learning: { type: Concept, relationship: [RelatedTo: Auto_Reward_Function] }
+          - Representation_Learning: { type: Concept, description: Learning useful data representations }
+          - Commonsense_Reasoning: { type: Concept, description: Human-like reasoning about everyday situations }
+          - Semantic_Enrichment: { type: Concept, description: Adding contextual meaning to data }
+          - Knowledge_Graph: { type: Concept, description: Graph-based knowledge representation }
+          - Ontology_Engineering: { type: Concept, description: Creating formal knowledge structures }
+          - Label_Space: { type: Concept, description: Set of possible classification labels }
+          - Label_Correlation: { type: Concept, description: Relationships between labels in multi-label settings }
+          - Zero_Shot_Learning: { type: Concept, description: Classification without specific training examples }
+          - Few_Shot_Learning: { type: Concept, description: Learning from minimal examples }
+          - Transfer_Learning: { type: Concept, description: Applying knowledge from one domain to another }
+          - Embeddings: { type: Concept, description: Vector representations of data }
+    - Frameworks_Libraries:
+        type: Technology_Area
+        description: Software libraries and frameworks for AI/ML development.
+        instances:
+          - DSPy: { type: Tool, purpose: LM program compilation, relationship: [UsedFor: Prompt_Engineering, LMops] }
+          - LangChain: { type: Tool, purpose: LM application development }
+          - LlamaIndex: { type: Tool, purpose: Data framework for LM applications }
+          - Guidance: { type: Tool, purpose: Generation control }
+          - LMQL: { type: Tool, purpose: Generation control }
+          - Outlines: { type: Tool, purpose: Generation control }
+          - Instructor: { type: Tool, purpose: Structured data extraction from LLMs }
+          - Autogen: { type: Tool, purpose: Multi-agent systems }
+          - MemGPT: { type: Tool, purpose: LLM with long-term memory }
+          - UnstructuredIO: { type: Tool, purpose: Data cleaning for unstructured data }
+          - Scikit-learn: { type: Library, language: Python, purpose: Machine learning algorithms }
+          - Pandas: { type: Library, language: Python, purpose: Data manipulation and analysis }
+          - Transformers: { type: Library, language: Python, purpose: Pre-trained models for NLP }
+          - LOTUS: { type: Tool, purpose: Semantic Analysis & Knowledge Synthesis }
+          - Adala: { type: Tool, purpose: Autonomous Data Labeling Agent }
+          - PyTorch: { type: Library, language: Python, purpose: Deep learning framework }
+          - TensorFlow: { type: Library, language: Python, purpose: Deep learning framework }
+          - Hugging_Face: { type: Platform, purpose: NLP models and datasets }
+          - Sentence_Transformers: { type: Library, purpose: Text embeddings }
+          - FAISS: { type: Library, purpose: Efficient similarity search }
+          - NLTK: { type: Library, purpose: Natural language processing }
+          - Spacy: { type: Library, purpose: Natural language processing }
+          - NetworkX: { type: Library, purpose: Graph analysis }
+          - Neo4j: { type: Database, purpose: Graph database }
+          - Weaviate: { type: Database, purpose: Vector database }
+          - Pinecone: { type: Service, purpose: Vector database }
+          - Chroma: { type: Database, purpose: Vector database }
+          - Milvus: { type: Database, purpose: Vector database }
+    - Applications:
+        type: Application_Area
+        description: Use cases and applications of AI/ML.
+        instances:
+          - Code_Generation: { type: Application, relationship: [RelatedTo: AlphaCodium, AutoDev, CodePlan] }
+          - Code_Understanding: { type: Application, relationship: [RelatedTo: SolidGPT, graph4code] }
+          - Search: { type: Application, relationship: [RelatedTo: Semantic_Search, Neural_Search] }
+          - Recommendation_Systems: { type: Application, relationship: [RelatedTo: RecSys] }
+          - Classification: { type: Application, relationship: [RelatedTo: XMLC, Multi_Label_Classification] }
+          - Automation: { type: Application, relationship: [RelatedTo: Agent_Process_Automation] }
+          - Generative_UI: { type: Application, relationship: [RelatedTo: Vercel_AI_SDK, v0] }
+          - Summarization: { type: Application, purpose: Condensing text into key points }
+          - Content_Writing: { type: Application, purpose: Generating written content }
+          - Data_Visualization: { type: Application, purpose: Visual representation of data }
+          - Document_Classification: { type: Application, purpose: Categorizing documents }
+          - Information_Retrieval: { type: Application, purpose: Finding relevant information }
+          - Knowledge_Graph_Construction: { type: Application, purpose: Building semantic networks }
+          - Semantic_Annotation: { type: Application, purpose: Adding metadata to content }
+          - Text_Clustering: { type: Application, purpose: Grouping similar documents }
+          - Entity_Recognition: { type: Application, purpose: Identifying named entities }
+          - Relation_Extraction: { type: Application, purpose: Finding relationships between entities }
+          - Semantic_Enrichment: { type: Application, purpose: Adding context to data }
+    - Research_Concepts:
+        type: Research_Area
+        description: Advanced or emerging concepts from research.
+        instances:
+          - Meta_Prompting: { type: Technique, description: Scaffolding technique for complex tasks }
+          - Agent_Patterns: { type: Concept, description: Reusable designs for AI agents (e.g., Plan-Execute, Self-Correction) }
+          - Reproducibility: { type: Concept, relationship: [RelatedTo: DSPy, FunSearch] }
+          - Auto_Reward_Function: { type: Concept, description: LLMs defining their own reward signals }
+          - Temporal_Facts: { type: Concept, description: Handling time-sensitive information }
+          - Nanopublications: { type: Concept, description: Atomic units of scientific assertion }
+          - XMLC_Algorithms: { type: Research_Area, description: Algorithms for extreme multi-label classification }
+          - Label_Embedding: { type: Technique, description: Representing labels in a lower-dimensional space }
+          - Tree_Based_Methods: { type: Algorithm_Family, description: Hierarchical approaches to classification }
+          - Ensemble_Methods: { type: Algorithm_Family, description: Combining multiple classifiers }
+          - Evaluation_Metrics: { type: Concept_Area, description: Measures for multi-label classification performance }
+          - Precision_at_k: { type: Metric, description: Precision of top k predictions }
+          - nDCG: { type: Metric, description: Normalized Discounted Cumulative Gain }
+          - Propensity_Scored_Metrics: { type: Metric_Family, description: Metrics accounting for label frequency }
+          - Label_Correlation_Analysis: { type: Technique, description: Studying relationships between labels }
+          - Feature_Selection: { type: Technique, description: Choosing relevant features for classification }
+          - Semantic_Similarity: { type: Concept, description: Measuring meaning-based similarity }
+          - Knowledge_Graph_Embeddings: { type: Technique, description: Vector representations of graph entities }
+          - Graph_Neural_Networks: { type: Model_Family, description: Neural networks for graph data }
+          - Transformer_Models: { type: Model_Family, description: Self-attention based architectures }
+          - Contrastive_Learning: { type: Technique, description: Learning by comparing similar and dissimilar examples }
+          - Self_Supervised_Learning: { type: Paradigm, description: Learning without explicit labels }
+    - Platforms_APIs:
+        type: Platform_Area
+        description: Services and APIs related to AI/ML.
+        instances:
+          - OpenAI_API: { type: API, vendor: OpenAI }
+          - Claude_API: { type: API, vendor: Anthropic }
+          - Cohere_API: { type: API, vendor: Cohere }
+          - Voyage_AI_API: { type: API, vendor: VoyageAI }
+          - Exa_AI: { type: Platform, purpose: Neural Search }
+          - Bytez: { type: Platform, purpose: AI Model Discovery }
+          - Zeta_Alpha: { type: Platform, purpose: AI Research Search }
+          - Replicate: { type: Platform, purpose: Model Hosting }
+          - HuggingFace: { type: Platform, purpose: "Model Hub, Datasets, Spaces" }
+
+Software_Development:
+  description: Concepts, tools, and practices for building software.
+  subcategories:
+    - Web_Development:
+        type: Technology_Area
+        description: Building websites and web applications.
+        instances:
+          - Frontend: { type: Concept }
+          - Backend: { type: Concept }
+          - Next_js: { type: Framework, language: JavaScript/TypeScript, relationship: [UsedFor: Frontend, Backend] }
+          - React: { type: Library, language: JavaScript, relationship: [UsedFor: Frontend] }
+          - Tailwind_CSS: { type: Framework, purpose: CSS Styling }
+          - Vercel: { type: Platform, purpose: Hosting, Deployment }
+          - HTML: { type: Language }
+          - JavaScript: { type: Language }
+          - TypeScript: { type: Language } # Implied by Next.js
+          - API: { type: Concept }
+          - CMS: { type: Concept, description: Content Management System, relationship: [RelatedTo: Basehub, Prisma, Directus] }
+          - Webflow: { type: Platform, purpose: Website Building }
+          - Nextra: { type: Framework, purpose: Documentation Sites, relationship: [BasedOn: Next_js] }
+          - Locofy: { type: Tool, purpose: Design to Code } # Mentioned JMB Floors
+          - Shadcn_UI: { type: Library, purpose: UI Components }
+    - Code_Management_Tools:
+        type: Tool_Area
+        description: Tools for managing, understanding, and editing code.
+        instances:
+          - GitHub: { type: Platform, purpose: Version Control, Collaboration }
+          - Git: { type: Tool, purpose: Version Control }
+          - Cursor: { type: Tool, purpose: AI Code Editor }
+          - RepoPilot: { type: Tool, purpose: Repository-level Code Editing }
+          - CodePlan: { type: Tool, purpose: Repository-level Coding via Planning }
+          - SolidGPT: { type: Tool, purpose: Repository-level Q&A }
+          - Codescholar: { type: Tool, purpose: Code Search } # Mentioned under PKM/Programming
+          - Aider: { type: Tool, purpose: AI Pair Programming (CLI) }
+          - CodeQAI: { type: Tool, purpose: Local Semantic Code Search }
+    - Development_Practices:
+        type: Concept_Area
+        description: Methodologies and concepts in software development.
+        instances:
+          - DevOps: { type: Concept } # Implied
+          - Testing: { type: Concept, relationship: [RelatedTo: AutoDev] }
+          - Documentation: { type: Concept, relationship: [RelatedTo: AutoDev, Doc_Comments_AI] }
+          - API_Design: { type: Concept, relationship: [RelatedTo: OpenAPI, Swagger] }
+    - Languages:
+        type: Technology_Area
+        description: Programming languages mentioned or implied.
+        instances:
+          - Python: { type: Language }
+          - JavaScript: { type: Language }
+          - TypeScript: { type: Language }
+          - Markdown: { type: Language, purpose: Documentation/Notes }
+          - YAML: { type: Language, purpose: Configuration/Data }
+          - JSON: { type: Language, purpose: Data Exchange }
+
+Project_Business_Development:
+  description: Ideas and strategies related to building products and businesses.
+  subcategories:
+    - Concepts:
+        type: Concept_Area
+        description: Core ideas in entrepreneurship.
+        instances:
+          - Indie_Hacking: { type: Concept, description: Solo or small team software business building }
+          - Founder_Journey: { type: Concept }
+          - Startup: { type: Concept }
+          - SaaS: { type: Concept, description: Software as a Service }
+          - Revenue_Streams: { type: Concept }
+          - Market_Fit: { type: Concept }
+          - Validation: { type: Concept }
+          - Iteration: { type: Concept }
+          - Pricing: { type: Concept }
+          - Go_To_Market_Strategy: { type: Concept }
+          - Community_Building: { type: Concept, relationship: "RelatedTo: BuildInPublic" }
+          - Minimum_Viable_Product_MVP: { type: Concept }
+          - Niche_Trends: { type: Concept }
+    - Marketing_Sales:
+        type: Activity_Area
+        description: Attracting and retaining customers.
+        instances:
+          - SEO: { type: Technique, description: Search Engine Optimization }
+          - Content_Marketing: { type: Technique }
+          - Social_Media_Marketing: { type: Technique, relationship: [Platform: Twitter] }
+          - Google_Ads: { type: Platform, purpose: Paid Advertising }
+          - Cold_Outreach: { type: Technique }
+          - Funnels: { type: Concept }
+          - Copywriting: { type: Skill }
+    - Project_Ideas:
+        type: Idea_Area
+        description: Specific business or project ideas mentioned.
+        instances:
+          - Architectural_AI_Service: { type: Project_Idea }
+          - GetPlans_Migration: { type: Project, status: In_Progress }
+          - JMBFloors_Website: { type: Project }
+          - Bookmark_Interface_App: { type: Project_Idea, relationship: [Uses: RAG, Vector_Search, Classification] }
+          - Website_Pricing_Aggregator: { type: Project_Idea }
+          - Niche_Trend_Extraction_Service: { type: Project_Idea }
+          - Browser_Augmented_LLM: { type: Project_Idea }
+          - Text_To_Banner_Tool: { type: Project_Idea, example: BestBanner }
+          - Founder_Agent: { type: Project_Idea }
+          - AI_Wedding_Speech_Maker: { type: Project_Idea } # Example from note
+          - One_Click_Deploy_Website_Tool: { type: Project_Idea }
+    - Platforms_Tools:
+        type: Tool_Area
+        description: Tools relevant to business building.
+        instances:
+          - Twitter: { type: Platform, purpose: [Marketing, Community, Research] }
+          - GitHub: { type: Platform, purpose: Code Hosting, Project Showcasing }
+          - Shopify: { type: Platform, purpose: E-commerce } # Mentioned as example
+          - CRM: { type: Tool_Category, purpose: Customer Relationship Management }
+          - Clay: { type: Platform, purpose: Outbound Marketing Automation } # Mentioned JMB Floors
+
+Personal_Knowledge_Management_Productivity:
+  description: Managing personal information, goals, and productivity.
+  subcategories:
+    - Concepts:
+        type: Concept_Area
+        instances:
+          - PKM: { type: Concept, description: Personal Knowledge Management }
+          - Note_Taking: { type: Activity }
+          - Ontology: { type: Concept, relationship: [UsedFor: PKM, Classification] }
+          - Knowledge_Graph: { type: Concept, relationship: [UsedFor: PKM, RAG] }
+          - Information_Retrieval: { type: Concept }
+          - Goal_Setting: { type: Activity, relationship: [RelatedTo: OKR] }
+          - Habit_Tracking: { type: Activity }
+          - Time_Management: { type: Activity, relationship: [RelatedTo: Pomodoro] }
+          - Memory_Enhancement: { type: Goal }
+          - First_Principles_Thinking: { type: Technique }
+          - GTD: { type: Methodology, description: Getting Things Done } # Mentioned
+    - Tools:
+        type: Tool_Area
+        instances:
+          - Obsidian: { type: Tool, purpose: Note Taking, PKM }
+          - Emacs: { type: Tool, purpose: Text Editor, Environment }
+          - Raindrop_io: { type: Tool, purpose: Bookmark Management }
+          - Neo4j: { type: Tool, purpose: Graph Database }
+          - Mem_ai: { type: Tool, purpose: AI Note Taking } # Mentioned
+          - Logseq: { type: Tool, purpose: Note Taking, PKM } # Mentioned clearer notes
+    - Personal_Goals_Reflections:
+        type: Content_Type
+        instances:
+          - Journaling: { type: Activity, contentType: JournalEntry }
+          - Goal_Travel: { type: Goal }
+          - Goal_Founder_Business: { type: Goal }
+          - Microdosing_Notes: { type: JournalEntry, topic: Health, privacy: High } # Handle sensitive data appropriately
+          - Biometrics_Logging: { type: Activity } # Mentioned
+
+Data_Management_Processing:
+  description: Handling, cleaning, searching, and analyzing data.
+  subcategories:
+    - Concepts:
+        type: Concept_Area
+        instances:
+          - Data_Cleaning: { type: Activity, description: Preparing data for analysis }
+          - Data_Pipeline: { type: Concept, description: Automated data processing workflow }
+          - Structured_Data: { type: Concept, description: Data with defined schema }
+          - Unstructured_Data: { type: Concept, description: Data without predefined format }
+          - Vector_Search: { type: Technique, relationship: [Uses: Vector_Database], description: Similarity search using vectors }
+          - Semantic_Search: { type: Technique, description: Search based on meaning rather than keywords }
+          - Neural_Search: { type: Technique, description: Search using neural networks }
+          - Knowledge_Representation: { type: Concept, relationship: [RelatedTo: Ontology, Knowledge_Graph], description: Formal representation of information }
+          - EDA: { type: Activity, description: Exploratory Data Analysis }
+          - Data_Enrichment: { type: Process, description: Adding value to existing data }
+          - Feature_Engineering: { type: Process, description: Creating features for machine learning }
+          - Data_Annotation: { type: Process, description: Adding labels or metadata to data }
+          - Data_Augmentation: { type: Technique, description: Increasing dataset size through transformations }
+          - Data_Synthesis: { type: Technique, description: Creating artificial data }
+          - Data_Fusion: { type: Technique, description: Combining data from multiple sources }
+          - Entity_Resolution: { type: Technique, description: Identifying same entities across datasets }
+          - Record_Linkage: { type: Technique, description: Matching records across datasets }
+          - Semantic_Annotation: { type: Technique, description: Adding semantic metadata }
+          - Ontology_Alignment: { type: Technique, description: Mapping between different ontologies }
+          - Schema_Matching: { type: Technique, description: Finding correspondences between schemas }
+          - Data_Integration: { type: Process, description: Combining data from different sources }
+          - ETL: { type: Process, description: Extract, Transform, Load }
+          - Data_Warehousing: { type: Concept, description: Storing data for analysis }
+          - Data_Lake: { type: Concept, description: Storage repository for raw data }
+          - Data_Mesh: { type: Architecture, description: Decentralized data architecture }
+          - Data_Fabric: { type: Architecture, description: Integrated data architecture }
+          - Metadata_Management: { type: Process, description: Managing information about data }
+          - Data_Catalog: { type: Tool, description: Inventory of available data }
+          - Data_Lineage: { type: Concept, description: Data origin and transformation history }
+          - Data_Governance: { type: Process, description: Managing data availability, usability, and security }
+    - Tools_Platforms:
+        type: Tool_Area
+        instances:
+          - UnstructuredIO: { type: Tool, purpose: Data Cleaning }
+          - Pandas: { type: Library, language: Python, purpose: Data Manipulation }
+          - Jupyter_Notebook: { type: Tool, purpose: EDA, Coding }
+          - Dagster: { type: Tool, purpose: Data Orchestration }
+          - Typesense: { type: Tool, purpose: Search Engine }
+          - Elasticsearch: { type: Tool, purpose: Search Engine }
+          - Neo4j: { type: Tool, purpose: Graph Database }
+          - PostgreSQL: { type: Tool, purpose: Relational Database } # Mentioned via pg_vector
+          - Nomic_Atlas: { type: Tool, purpose: Data Visualization/Interaction } # Mentioned in requirement template
+
+Architecture_Construction:
+  description: Specific domain related to architecture and building.
+  subcategories:
+    - Concepts:
+        type: Concept_Area
+        instances:
+          - Architectural_Design: { type: Activity }
+          - Planning_Permission: { type: Process }
+          - Building_Control: { type: Process }
+          - Technical_Drawings: { type: Artifact }
+          - Lidar_Scanning: { type: Technique, purpose: Surveying }
+          - Online_Survey: { type: Technique, purpose: Surveying }
+          - Project_Management_Arch: { type: Activity }
+          - Cost_Estimation: { type: Activity }
+          - Tendering: { type: Process }
+    - Projects:
+        type: Project_Area
+        instances:
+          - GetPlans: { type: Project, status: In_Progress }
+          - JMBFLOORS: { type: Project }
+          - Architectural_AI_Project: { type: Project_Idea }
+    - Tools_Resources:
+        type: Resource_Area
+        instances:
+          - PlanningGeek: { type: Resource, purpose: Education }
+          - Archit_Plan_App: { type: Tool } # Mentioned in transcribed video text
+
+# --- Content & Interaction Types ---
+
+ContentType:
+  - GitHub_Repo: { description: A software repository hosted on GitHub }
+  - Tweet: { description: A post on Twitter/X }
+  - ArXiv_Paper: { description: A research paper hosted on ArXiv }
+  - Article: { description: A blog post or news article }
+  - Documentation: { description: Technical documentation for software or APIs }
+  - JournalEntry: { description: A personal log or reflection }
+  - Project_Idea: { description: A concept for a new project or business }
+  - Code_Snippet: { description: A small piece of executable code }
+  - API_Reference: { description: Documentation detailing an API's usage }
+  - Chat_Log: { description: Transcript of a conversation }
+  - Note: { description: General purpose note }
+  - Link: { description: A URL pointing to a web resource }
+  - Research_Paper: { description: Academic or scientific publication }
+  - Tutorial: { description: Step-by-step guide }
+  - Dataset: { description: Collection of data for analysis or training }
+  - Benchmark: { description: Standard test for performance evaluation }
+  - Library: { description: Software package providing functionality }
+  - Framework: { description: Software providing structure for applications }
+  - Tool: { description: Software utility for specific tasks }
+  - Video: { description: Visual content }
+  - Podcast: { description: Audio content }
+  - Slide_Deck: { description: Presentation slides }
+  - Book: { description: Extended written work }
+  - Course: { description: Educational material }
+
+InteractionPurpose:
+  - Learning: { description: Acquiring knowledge or understanding a concept }
+  - Reference: { description: Looking up specific information or syntax }
+  - Tutorial: { description: Step-by-step guide to perform a task }
+  - Brainstorming: { description: Generating ideas }
+  - Planning: { description: Outlining steps for a project or goal }
+  - Debugging: { description: Finding and fixing errors }
+  - Comparison: { description: Evaluating different tools or techniques }
+  - Announcement: { description: Sharing news or updates }
+  - Exploration: { description: Investigating a new topic or tool }
+  - Implementation: { description: Putting concepts into practice }
+  - Evaluation: { description: Assessing performance or quality }
+  - Research: { description: Investigating a topic in depth }
+  - Analysis: { description: Breaking down complex information }
+  - Synthesis: { description: Combining information from multiple sources }
+  - Classification: { description: Organizing information into categories }
+  - Enrichment: { description: Adding value to existing information }
+  - Integration: { description: Combining systems or data sources }
+  - Optimization: { description: Improving performance or efficiency }
+
+# --- XMLC Specific Concepts ---
+
+XMLC:
+  description: Extreme Multi-Label Classification concepts and techniques
+  subcategories:
+    - Algorithms:
+        type: Algorithm_Area
+        description: Algorithms specifically designed for XMLC
+        instances:
+          - FastXML: { type: Algorithm, description: Tree-based ensemble for XMLC }
+          - PfastreXML: { type: Algorithm, description: Propensity scored FastXML }
+          - Parabel: { type: Algorithm, description: Partitioning-based XMLC }
+          - AnnexML: { type: Algorithm, description: Approximate nearest neighbor XMLC }
+          - DiSMEC: { type: Algorithm, description: Distributed sparse machines for XMLC }
+          - XML-CNN: { type: Algorithm, description: CNN-based approach for XMLC }
+          - AttentionXML: { type: Algorithm, description: Attention-based XMLC }
+          - X-Transformer: { type: Algorithm, description: Transformer-based XMLC }
+          - APLC-XLNet: { type: Algorithm, description: XLNet-based XMLC }
+          - LightXML: { type: Algorithm, description: Lightweight XMLC }
+    - Evaluation_Metrics:
+        type: Metric_Area
+        description: Metrics for evaluating XMLC performance
+        instances:
+          - Precision_at_k: { type: Metric, description: Precision of top k predictions }
+          - Recall_at_k: { type: Metric, description: Recall of top k predictions }
+          - nDCG: { type: Metric, description: Normalized Discounted Cumulative Gain }
+          - PSP_at_k: { type: Metric, description: Propensity Scored Precision at k }
+          - PSR_at_k: { type: Metric, description: Propensity Scored Recall at k }
+          - Hamming_Loss: { type: Metric, description: Fraction of wrong labels }
+          - F1_Score: { type: Metric, description: Harmonic mean of precision and recall }
+          - Micro_F1: { type: Metric, description: F1 calculated globally }
+          - Macro_F1: { type: Metric, description: Average of per-class F1 scores }
+    - Challenges:
+        type: Problem_Area
+        description: Challenges in XMLC
+        instances:
+          - Label_Sparsity: { type: Challenge, description: Most instances have few labels }
+          - Label_Imbalance: { type: Challenge, description: Some labels are very rare }
+          - Computational_Complexity: { type: Challenge, description: Scaling to millions of labels }
+          - Feature_Extraction: { type: Challenge, description: Finding relevant features }
+          - Label_Correlation: { type: Challenge, description: Capturing dependencies between labels }
+          - Tail_Labels: { type: Challenge, description: Handling rare labels }
+          - Hierarchical_Structure: { type: Challenge, description: Leveraging label hierarchies }
+    - Datasets:
+        type: Dataset_Area
+        description: Common datasets for XMLC research
+        instances:
+          - Wikipedia_LSHTC: { type: Dataset, description: Wikipedia articles for Large-Scale Hierarchical Text Classification }
+          - Amazon_670K: { type: Dataset, description: Amazon product catalog with 670K labels }
+          - Wiki10-31K: { type: Dataset, description: Wikipedia with 31K labels }
+          - Delicious-200K: { type: Dataset, description: Delicious bookmarks with 200K labels }
+          - EURLex-4K: { type: Dataset, description: EU legal documents with 4K labels }
+          - AmazonCat-13K: { type: Dataset, description: Amazon catalog with 13K labels }
+          - WikiLSHTC-325K: { type: Dataset, description: Wikipedia with 325K labels }
+          - BioASQ: { type: Dataset, description: Biomedical semantic indexing }
