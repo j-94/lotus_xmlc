@@ -24,7 +24,8 @@ var/
 */.ipynb_checkpoints/*
 
 # Large data files
-ontology_label_index/
+ontology_label_index/*
+!ontology_label_index/.gitkeep
 
 # macOS
 .DS_Store
