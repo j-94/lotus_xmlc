@@ -3,6 +3,19 @@
 !Ontology.yaml
 !*.ipynb
 !.gitignore
+!enriched/xmlc-lotus.py
+!run_xmlc.py
+!README.md
 
 # Specifically exclude large files
 Dataset.jsonl
+data-bookmark.jsonl
+**/index_output/
+**/enriched_bookmarks_advanced.jsonl
+**/ontology_suggestions.jsonl
+
+# Python virtual environments
+lotus_env/
+venv/
+__pycache__/
+*.py[cod]
