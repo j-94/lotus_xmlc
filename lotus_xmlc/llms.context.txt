@@ -1,0 +1,114 @@
+o1 ascii diagram [                                   ┌─────────────────────────┐
+                                   │      User's DataFrame   │
+                                   │ (e.g. `df` from pandas) │
+                                   └─────────┬───────────────┘
+                                             │
+                                             │
+                                             ▼
+                       User calls an operator method, e.g. df.sem_filter(...) or df.sem_join(...):
+                       ┌────────────────────────────────────────────────────────────────┐
+                       │  DataFrame Accessor (pandas API extension)                    │
+                       │  * Each operator is defined as:                               │
+                       │    @pd.api.extensions.register_dataframe_accessor("sem_XXX")  │
+                       │  * This accessor calls a function in sem_ops/sem_XXX.py       │
+                       └────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+           ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+           │  sem_ops (the module for each operator)                                                              │
+           │                                                                                                       │
+           │  * e.g. `sem_filter.py` defines a DataFrame accessor class `SemFilterDataframe`, which has `__call__` │
+           │    that:                                                                                              │
+           │    1) Parses user text (e.g. "Claim: {Course Name} requires math") using `nl_expression` utilities.   │
+           │    2) Builds prompts with `templates.task_instructions.filter_formatter(...)`.                        │
+           │    3) Calls the configured LM from `settings.lm`.                                                     │
+           │    4) Postprocesses the results (`postprocessors.filter_postprocess(...)`).                           │
+           │  * Similar logic for sem_map, sem_agg, sem_join, etc.                                                │
+           └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+                   ┌───────────────────────────────────────────────────────────────────────┐
+                   │   lotus.settings.configure(...) sets:                                │
+                   │       - settings.lm (LM instance)                                    │
+                   │       - settings.rm (RM instance)                                    │
+                   │       - settings.helper_lm (LM for cascades)                         │
+                   │       - settings.reranker (CrossEncoderReranker)                     │
+                   │   + toggles for message cache, operator cache, parallel grouping, etc.│
+                   └───────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+         ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+         │  If an operator needs to produce a prompt for the LM (like filter, map, etc.):                        │
+         │    - The operator code calls `templates/task_instructions.py` ( e.g. filter_formatter(...) )          │
+         │    - The user_instruction + DataFrame row content => A structured prompt for the LM.                  │
+         │    - If there are examples for CoT or few-shot, we embed them in the prompt.                           │
+         └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+                     ┌─────────────────────────────────────────────────────────────────────────┐
+                     │  The operator calls the LM via `model(...)`, passing a list of prompts │
+                     │  * The LM class (lm.py) uses a litellm-based `batch_completion` call   │
+                     │  * Automatic caching if `enable_message_cache=True` in settings         │
+                     └─────────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+ │  lotus/models/LM (lm.py):                                                                                      │
+ │    - Wraps around litellm to do the actual completions.                                                        │
+ │    - Has:                                                                                                      │
+ │       * self.cache (InMemoryCache or SQLiteCache from lotus/cache.py)                                          │
+ │       * self.max_batch_size, self.kwargs (like temperature, max_tokens, etc.)                                  │
+ │    - On each call:                                                                                             │
+ │       1) Checks cache for an existing response.                                                                │
+ │       2) For uncached prompts, calls `litellm.batch_completion(...)`.                                          │
+ │       3) Updates usage stats in LMStats (prompt tokens, cost, etc.).                                           │
+ │       4) Returns an LMOutput containing the text + optional logprobs.                                          │
+ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+                       ┌──────────────────────────────────────────────────────────────────────┐
+                       │   Caching System (lotus/cache.py)                                    │
+                       │      - CacheType.IN_MEMORY or CacheType.SQLITE                      │
+                       │      - Decorator @operator_cache for sem_ops that caches entire      │
+                       │        DataFrame-level results.                                      │
+                       │      - Provide get / insert functionality with LRU or size-based     │
+                       │        eviction.                                                     │
+                       └──────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+                   ┌───────────────────────────────────────────────────────────────────────────────────┐
+                   │  If an operator needs embeddings or similarity search, it calls settings.rm:     │
+                   │    - e.g. SentenceTransformersRM or LiteLLMRM or ColBERTv2RM.                    │
+                   │    - The sem_index, sem_search, sem_sim_join ops rely on RM.                     │
+                   │    - RM calls `.index(...)` to build a faiss index or colbert index.             │
+                   │    - Then `.load_index(...)` sets self.faiss_index or self.docs, etc.            │
+                   │    - A top-K retrieval is done by `rm(queries, K) -> RMOutput(indices, dist).`   │
+                   └───────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+     ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+     │  Additional flows:                                                                                      │
+     │    - sem_ops/cascade_utils.py => approximation/cascade approach:                                        │
+     │        * importance_sampling, calibrate_llm_logprobs, learn_cascade_thresholds                           │
+     │        * Used in sem_filter or sem_join cascade mode.                                                   │
+     │    - sem_ops/sem_topk => quicksort or naive O(N^2) sorting with repeated LM comparisons                 │
+     │    - sem_ops/sem_extract => prompts for structured JSON extraction from each row.                       │
+     │    - sem_ops/sem_dedup => uses sem_sim_join to identify duplicates.                                     │
+     │    - sem_ops/sem_cluster_by => uses an RM index, then runs k-means in memory on embedding vectors.      │
+     └───────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                                             │
+                                             ▼
+                           ┌────────────────────────────────────────────────────────────────┐
+                           │  The operator returns a modified DataFrame or a summary value │
+                           │  to the user. E.g. `df.sem_filter(...)` yields a subset of df, │
+                           │  while `df.sem_agg(...)` yields a single summarizing row, etc.│
+                           └────────────────────────────────────────────────────────────────┘]
